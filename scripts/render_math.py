@@ -57,7 +57,7 @@ def main():
         width, height = render(name, equation['tex'], 22)
         compact_width, compact_height = render(name + '-compact', equation.get('compact', equation['tex']), 20)
         picture = f'''<picture style="--math-width: {width}px; --math-compact-width: {compact_width}px">
-        <source media="(max-width: 700px)" srcset="assets/math/{name}-compact.svg" width="{compact_width}" height="{compact_height}">
+        <source media="(max-width: 760px)" srcset="assets/math/{name}-compact.svg" width="{compact_width}" height="{compact_height}">
         <img src="assets/math/{name}.svg" width="{width}" height="{height}" alt="{html.escape(equation['alt'], quote=True)}" loading="lazy">
       </picture>'''
         marker = rf'(<div class="math-display" data-equation="{name}">)[\s\S]*?(</div>)'

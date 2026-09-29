@@ -83,7 +83,8 @@ figcaption strong { color: #43474c; }
 .math-display picture { display: block; }
 .math-display img { display: block; width: var(--math-width); max-width: 100%; height: auto; margin-inline: auto; }
 .equation-note { font-size: 16px; color: var(--muted); }
-.medium-figure { width: 85%; margin-inline: auto; margin-top: 28px; }
+.medium-figure { width: min(100%, 720px); margin-inline: auto; margin-top: 28px; }
+.filtering-figure { width: min(100%, 920px); margin-inline: auto; }
 .table-scroll { width: 100%; overflow-x: auto; margin: 30px 0 14px; }
 table { width: 100%; border-collapse: collapse; font-size: 16px; font-variant-numeric: tabular-nums; }
 caption { text-align: left; color: #666b72; font-size: 13px; margin-bottom: 12px; }
@@ -97,7 +98,7 @@ tbody th { font-weight: 400; }
 .experiment-details { margin: 25px 0 12px; padding: 0; border-block: 1px solid var(--line); }
 .experiment-details summary { cursor: pointer; padding: 13px 0; font-weight: 500; font-size: 15px; }
 .experiment-details p { font-size: 17px; margin: 0 0 16px; }
-.seed-study { display: grid; grid-template-columns: 1.05fr 1fr; gap: 36px; align-items: center; margin-top: 46px; }
+.seed-study { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; margin-top: 46px; }
 .seed-study h3 { margin-top: 0; }
 .seed-study p { font-size: 18px; }
 .seed-study figure { margin: 0; }
