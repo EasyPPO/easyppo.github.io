@@ -2,7 +2,7 @@
 
 Static project page for **EasyPPO: Stabilizing the Critic Is Key**.
 
-Published at <https://easyppo.github.io/>. The layout takes inspiration from the [Agent-TTS project page](https://agent-tts.github.io/agent-tts/); the page, styles, and interactions are implemented here without a framework.
+Published at <https://easyppo.github.io/>. The page, styles, and interactions are implemented without a framework.
 
 ## Preview
 
