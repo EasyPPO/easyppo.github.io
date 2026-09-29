@@ -1,0 +1,24 @@
+# EasyPPO project website
+
+Static project page for **EasyPPO: Stabilizing the Critic Is Key**.
+
+Published at <https://easyppo.github.io/>. The layout takes inspiration from the [Agent-TTS project page](https://agent-tts.github.io/agent-tts/); the page, styles, and interactions are implemented here without a framework.
+
+## Preview
+
+```sh
+python3 -m http.server 8000
+```
+
+Open `http://localhost:8000`. No build step or JavaScript dependency installation is required. Text, figures, and navigation also work without JavaScript. JavaScript adds figure previews and citation copying.
+
+## Update
+
+- Edit narrative, authors, links, and the score table in `index.html`.
+- Edit styling in `assets/css/style.css`.
+- Figures are rendered from the corresponding manuscript PDFs, without changing plotted data. `assets/figure-manifest.json` records their source filenames, dimensions, checksums, and the manuscript commit.
+- To refresh those assets, run `python3 scripts/update_figures.py /path/to/manuscript` with Pillow and Poppler installed. Check the figures, HTML image dimensions, captions, score table, and social-preview image afterward.
+- Paper and Code are intentionally disabled gray buttons until their public URLs are available. Replace each with a link on release. The manuscript PDF is not published in this repository. The footer’s Website source link is only this website’s source.
+- Keep score gains and seed-study claims synchronized with the paper. Reported percentage gains compare best validation checkpoints; seed-study bands are min–max, not confidence intervals.
+
+GitHub Pages serves the root of the `main` branch. `.nojekyll` keeps the site static.

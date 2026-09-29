@@ -1,0 +1,51 @@
+{
+  "teaser": {
+    "source": "teaser.pdf",
+    "width": 2400,
+    "height": 1269,
+    "sha256": "3b7da8a4621e798866a970fe23548f9c06884afd634c4f9df971b34f425249b8"
+  },
+  "filtering": {
+    "source": "frontiercs_overlong_filtering.pdf",
+    "width": 2400,
+    "height": 811,
+    "sha256": "36bb873b1962a2c496421a65eed6d649da293d2a4d0f32777abfa28db2dea9c1"
+  },
+  "return-noise": {
+    "source": "fcs_critic_gradient_combined.pdf",
+    "width": 2400,
+    "height": 1070,
+    "sha256": "085b48a264ec78777583fb97ff78178158122deb07ae1bf665636aa26cfad3b1"
+  },
+  "main-results": {
+    "source": "main_results.pdf",
+    "width": 2400,
+    "height": 1519,
+    "sha256": "abbd3cc75fdd046afe511bf5c6ce74b3a7df3f8919731a8b2b41fd2d525337a6"
+  },
+  "critic-learning": {
+    "source": "fcs_critic_diagnostics_wrap.pdf",
+    "width": 2400,
+    "height": 1222,
+    "sha256": "c9ec377593ad8682d3c830d496086bb77911ea891ebfa13b8653c6b31d5635aa"
+  },
+  "normalization": {
+    "source": "fcs_normalization_ablation.pdf",
+    "width": 2400,
+    "height": 1327,
+    "sha256": "62625ae0430cedc6745406d17feaa9aa6c767f16cba59b0870452af799794fab"
+  },
+  "mini-batches": {
+    "source": "fcs_minibatch_ablation.pdf",
+    "width": 2400,
+    "height": 1261,
+    "sha256": "056bd24b35c2b31d74ba4d4cef288dfcf5ff1ad9d4a18a44d0132f25f1205570"
+  },
+  "seeds": {
+    "source": "fcs_seed_comparison.pdf",
+    "width": 2400,
+    "height": 1519,
+    "sha256": "64678efe1cacefc6462815bc3bda67ac2a7b1bc1756dc61f9d9e4e0a3282edfb"
+  },
+  "paper_commit": "8ad8afbf9de15d6d6d3f01f0f3a32cf68f3de4ae"
+}

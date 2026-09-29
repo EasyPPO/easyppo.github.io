@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>EasyPPO: Stabilizing the Critic Is Key</title>
+  <meta name="description" content="Why does PPO training collapse? EasyPPO traces two causes to critic learning and stabilizes training with actor-only filtering, noise normalization, and smaller critic mini-batches.">
+  <link rel="canonical" href="https://easyppo.github.io/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="EasyPPO: Stabilizing the Critic Is Key">
+  <meta property="og:description" content="Two critic failure modes. Three simple changes. Stable PPO training across coding, math, and search.">
+  <meta property="og:url" content="https://easyppo.github.io/">
+  <meta property="og:image" content="https://easyppo.github.io/assets/social-preview.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script src="assets/js/site.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<nav class="nav" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a class="wordmark" href="#top">Easy<span>PPO</span></a>
+    <div class="nav-links">
+      <a href="#overview">Overview</a>
+      <a href="#filtering">Filtering</a>
+      <a href="#noise">Return noise</a>
+      <a href="#mini-batches">Mini-batches</a>
+      <a href="#results">Results</a>
+      <a href="#citation">BibTeX</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero wrap" id="top">
+  <p class="eyebrow">Reinforcement learning for language models</p>
+  <h1><span class="method-name">EasyPPO:</span><br>Stabilizing the Critic Is Key</h1>
+  <p class="hero-summary">PPO can learn well, then collapse. We trace two causes to the critic<br class="desktop-break"> and stabilize training with three simple changes.</p>
+  <div class="institution-logos" aria-label="UC Berkeley and Princeton University">
+    <img src="assets/logos/berkeley.svg" class="berkeley-logo" width="173" height="52" alt="UC Berkeley">
+    <img src="assets/logos/princeton.svg" class="princeton-logo" width="189" height="49" alt="Princeton University">
+  </div>
+  <p class="authors">
+    <span>Xuanyi Zhou<sup>1,*†</sup>,</span>
+    <span>Qiuyang Mang<sup>1,*</sup>,</span>
+    <span>Dacheng Li<sup>1</sup>,</span>
+    <span>Wenhao Chai<sup>2</sup>,</span>
+    <span>Mayank Mishra<sup>1</sup>,</span>
+    <span>Yichuan Wang<sup>1</sup>,</span>
+    <span>Karthik Narasimhan<sup>2</sup>,</span>
+    <span>Alvin Cheung<sup>1</sup>,</span>
+    <span>Joseph Gonzalez<sup>1</sup>
+    </span>
+  </p>
+  <p class="affiliations"><span><sup>1</sup> UC Berkeley</span><span><sup>2</sup> Princeton University</span></p>
+  <p class="author-note"><span>* Equal contribution</span><span>† Project leader</span><a href="mailto:qmang@berkeley.edu">qmang@berkeley.edu</a></p>
+  <div class="button-row">
+    <button class="button button-pending" type="button" disabled title="Paper link coming soon" aria-label="Paper — coming soon">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6V3Zm8 0v5h4M9 12h6m-6 4h6"/></svg>Paper <span class="pending-label">Soon</span>
+    </button>
+    <button class="button button-pending" type="button" disabled title="Training code coming soon" aria-label="Code — coming soon">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 7-5 5 5 5m8-10 5 5-5 5m-5-14-2 18"/></svg>Code <span class="pending-label">Soon</span>
+    </button>
+    <a class="button button-secondary" href="#citation">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5H6v14h3m6-14h3v14h-3M10 9h4m-4 6h4"/></svg>BibTeX
+    </a>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+    <figure class="teaser opening-figure">
+      <a class="figure-link" href="assets/figures/teaser.webp" data-lightbox aria-label="Enlarge the EasyPPO method overview">
+        <img src="assets/figures/teaser.webp" width="2400" height="1269" alt="Two rows compare critic failure modes with EasyPPO. Left: retain truncated responses for the critic only. Middle: balance gradient scales across prompts. Right: clip gradients from smaller critic mini-batches." fetchpriority="high">
+      </a>
+      <figcaption><strong>Three changes to stabilize PPO.</strong> Left: actor-only filtering. Middle: noise-normalized critic regression. Right: clipping on smaller critic mini-batches. <span class="zoom-hint">Click any figure to enlarge.</span></figcaption>
+    </figure>
+  <section class="overview" id="overview" aria-labelledby="overview-title">
+    <h2 id="overview-title">The idea in a minute</h2>
+    <p>PPO uses a critic to estimate how much reward a response is likely to earn. The actor uses that estimate to decide which responses to reinforce. If critic learning becomes unstable, the actor can lose a useful training signal.</p>
+    <div class="summary-box">
+      <p><strong>Keep the critic’s training data complete.</strong> Filter unfinished responses from actor updates, but keep them when training the critic.</p>
+      <p><strong>Balance the noise across prompts.</strong> Weight each prompt’s critic loss by the inverse standard deviation of its sampled returns.</p>
+      <p><strong>Limit how far outliers reach.</strong> Use moderately smaller critic mini-batches, with gradient clipping at each update.</p>
+      <p class="summary-last">The actor still uses the standard PPO update.</p>
+    </div>
+
+  </section>
+
+  <section class="section" id="filtering" aria-labelledby="filtering-title">
+    <p class="section-number">01 / Keep unfinished responses in critic learning</p>
+    <h2 id="filtering-title">A better score can hide more unfinished responses</h2>
+    <p>A response that hits the length limit may receive a low reward simply because it never finished. Filtering these responses from actor updates is common. In PPO, it is tempting to remove them from critic training too.</p>
+    <p>But then the critic only sees responses that finish. It learns their average reward instead of the average over <em>all</em> responses. Our analysis shows that, in an idealized accurate-critic setting, filtering both networks changes the policy objective to reward <em>conditioned on completion</em>. That score can improve even as more responses hit the length limit.</p>
+    <figure>
+      <a class="figure-link" href="assets/figures/filtering.webp" data-lightbox aria-label="Enlarge the overlong filtering experiment">
+        <img src="assets/figures/filtering.webp" width="2400" height="811" loading="lazy" alt="FrontierCS filtering comparison: joint actor-and-critic filtering leads to high truncation; completed-response rewards can rise while overall rewards remain low. Actor-only filtering improves overall reward but still shows instability.">
+      </a>
+      <figcaption><strong>Reward among completed responses tells only part of the story.</strong> FrontierCS training with a 32,768-token response limit. Left: truncation. Middle: overall reward. Right: reward among completed responses. Gray marks critic warmup.</figcaption>
+    </figure>
+    <div class="takeaway"><strong>The change:</strong> filter truncated responses only from actor updates. Keep every response for critic learning, so the critic can learn about unfinished responses too. This helps, but does not by itself prevent collapse.</div>
+  </section>
+
+  <section class="section" id="noise" aria-labelledby="noise-title">
+    <p class="section-number">02 / Balance return noise across prompts</p>
+    <h2 id="noise-title">A noisier prompt should not dominate the update</h2>
+    <p>The same prompt can produce responses with very different rewards. Some prompts have consistent returns; others vary widely, especially in continuous-score coding tasks. We call this variation <em>return noise</em>.</p>
+    <p>The critic tries to predict the mean return, but trains on individual samples. Even when its prediction is accurate, a noisy sample can produce a large gradient. For a linear value head, the expected squared gradient contains both prediction error and return variance:</p>
+    <div class="equation-box" role="math" tabindex="0" aria-label="Expected squared critic gradient equals feature norm squared times the sum of squared prediction error and return variance.">
+      <span class="equation"><span class="equation-left">E[‖∇<sub>W</sub>ℒ<sub>V</sub>‖² | s] = ‖h(s)‖²</span> <span class="equation-bracket">[<span class="equation-term">(V(s) − E[R | s])²<span>prediction error</span></span> + <span class="equation-term noise-term">Var(R | s)<span>return noise</span></span>]</span></span>
+    </div>
+    <p class="equation-note">Here, <i>s</i> is a token prefix, <i>R</i> is its sampled return, and the value head predicts <i>V(s) = W<sup>⊤</sup>h(s)</i>. As predictions improve, the noise term can account for more of the gradient’s second moment.</p>
+    <p><strong>Noise-normalized critic regression</strong> divides the critic loss by the return standard deviation. With exact prefix-level variances, this makes the noise term constant while preserving the optimal mean prediction. In practice, we estimate one standard deviation per prompt from its rollout group, apply a floor, and normalize the weights to average one.</p>
+    <figure>
+      <a class="figure-link" href="assets/figures/return-noise.webp" data-lightbox aria-label="Enlarge the return noise and critic gradient comparison">
+        <img src="assets/figures/return-noise.webp" width="2400" height="1070" loading="lazy" alt="Box plots at training steps 30, 60, and 90 and pooled across those steps. Before normalization, prompts with higher return standard deviations tend to have larger gradient contributions. After normalization this relationship is much weaker.">
+      </a>
+      <figcaption><strong>The imbalance appears in the gradients, and normalization reduces it.</strong> Offline FrontierCS diagnostics at PPO training steps 30, 60, and 90. Top: unweighted gradients. Bottom: the same gradients after weighting. Each response contributes its summed token gradients divided by the batch’s total token count.</figcaption>
+    </figure>
+    <div class="takeaway"><strong>What changes:</strong> prompts with noisier returns no longer receive extra influence simply because their return-noise scale is larger. Large individual gradients can still remain.</div>
+  </section>
+
+  <section class="section" id="mini-batches" aria-labelledby="mini-batches-title">
+    <p class="section-number">03 / Contain the remaining outliers</p>
+    <h2 id="mini-batches-title">Smaller mini-batches make clipping more local</h2>
+    <p>Gradient clipping rescales an entire mini-batch gradient when its norm is too large. If one outlier dominates a large mini-batch, clipping scales down everyone’s contribution together. Splitting the batch means fewer responses are affected by that outlier.</p>
+    <p>There is a trade-off: smaller mini-batches also average out less return noise. Our idealized analysis captures these opposing trends. The bound on a single outlier’s influence grows with mini-batch size, while the gradient variance falls with it. Smaller is therefore not always better.</p>
+    <figure class="medium-figure">
+      <a class="figure-link" href="assets/figures/mini-batches.webp" data-lightbox aria-label="Enlarge the critic mini-batch size experiment">
+        <img src="assets/figures/mini-batches.webp" width="2400" height="1261" loading="lazy" alt="FrontierCS critic explained variance for 1, 2, 4, 8, and 16 mini-batches. More splits reach nonnegative explained variance sooner, but four and eight achieve higher explained variance later in training.">
+      </a>
+      <figcaption><strong>Finer splits help early; averaging matters later.</strong> Left: critic explained variance, smoothed over five points. Right: the first step with nonnegative raw explained variance. We hold the rollout batch fixed and scale the learning rate as 1/√K, where K is the number of mini-batches.</figcaption>
+    </figure>
+    <div class="takeaway"><strong>Our choice:</strong> four critic mini-batches per rollout batch, clipping each averaged mini-batch gradient before its optimizer step. The next mini-batch uses the updated critic.</div>
+  </section>
+
+  <section class="section" id="results" aria-labelledby="results-title">
+    <p class="section-number">The full recipe</p>
+    <h2 id="results-title">Higher scores, without late training collapse</h2>
+    <p>We test continuous-score coding on FrontierCS, single-turn math on AIME24, and multi-turn search on Search-R1. EasyPPO achieves the highest best-checkpoint validation score on all three. Over the evaluated training horizons, it is also the only compared method that stays stable across all three tasks.</p>
+    <figure>
+      <a class="figure-link" href="assets/figures/main-results.webp" data-lightbox aria-label="Enlarge all training and validation results">
+        <img src="assets/figures/main-results.webp" width="2400" height="1519" loading="lazy" alt="Six panels compare EasyPPO, PPO, PPO with actor-only filtering, HL-Gauss PPO, and VAPO. Columns are FrontierCS, AIME, and Search-R1. Training curves are on top, validation below. EasyPPO preserves its gains while every baseline collapses in at least one task.">
+      </a>
+      <figcaption><strong>EasyPPO sustains learning across tasks.</strong> Left to right: FrontierCS, AIME, and Search-R1. Top: training. Bottom: validation. Each curve is one run; training is smoothed and validation is not. Gray marks the shared 30-step critic warmup.</figcaption>
+    </figure>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="Best validation scores by method and task">
+      <table>
+        <caption>Best validation checkpoint · scores on a 0–100 scale</caption>
+        <thead><tr><th scope="col">Method</th><th scope="col">FrontierCS</th><th scope="col">AIME24</th><th scope="col">Search-R1</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">PPO</th><td>12.90</td><td>64.06</td><td>39.48</td></tr>
+          <tr><th scope="row">PPO + actor-only filtering</th><td>13.91</td><td>60.73</td><td>41.74</td></tr>
+          <tr><th scope="row">HL-Gauss PPO</th><td>10.43</td><td>63.13</td><td>42.33</td></tr>
+          <tr><th scope="row">VAPO</th><td>5.58</td><td>54.90</td><td>40.36</td></tr>
+          <tr class="ours"><th scope="row">EasyPPO</th><td>14.82</td><td>65.52</td><td>43.22</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="table-note">Relative gains over PPO: <strong>14.89%</strong> on FrontierCS, <strong>2.28%</strong> on AIME24, and <strong>9.47%</strong> on Search-R1. These compare each method’s best checkpoint, rather than its final score.</p>
+    <details class="experiment-details">
+      <summary>Shared training setup</summary>
+      <p>All methods run strictly on-policy in verl, with 30 critic warmup steps. Rollout batches contain 512 responses for FrontierCS and AIME, and 1,024 for Search-R1. Group sizes are 32, 16, and 16, respectively.</p>
+      <p>FrontierCS uses Qwen3.5-9B, initialized with SFT on 347 nonzero-score DeepSeek-V3.1 trajectories from the same 200 FrontierSmith training problems. Validation uses the separate FrontierCS algorithmic track. AIME and Search-R1 use Qwen3.5-9B-Base.</p>
+      <p>PPO is verl’s vanilla implementation. PPO, HL-Gauss PPO, and VAPO use no overlong filtering, following their original recipes. The actor-only-filtering baseline changes only PPO’s filtering rule. We omit VAPO’s auxiliary positive-example language-modeling loss to focus on PPO updates. See the paper’s Appendix A for full configurations.</p>
+    </details>
+
+    <h3>A steadier critic accompanies steadier training</h3>
+    <p>On FrontierCS, EasyPPO’s critic gradient norm declines after warmup, and its explained variance improves smoothly. The other methods show larger swings. High explained variance alone is not enough: HL-Gauss reaches nearly one after its actor has already collapsed, when predicting the consistently low return becomes easy.</p>
+    <figure class="medium-figure">
+      <a class="figure-link" href="assets/figures/critic-learning.webp" data-lightbox aria-label="Enlarge the critic learning diagnostics">
+        <img src="assets/figures/critic-learning.webp" width="2400" height="1222" loading="lazy" alt="FrontierCS critic gradient norm before clipping and explained variance. EasyPPO's gradients settle and its explained variance rises steadily, while the baseline curves fluctuate sharply.">
+      </a>
+      <figcaption><strong>Stable critic learning accompanies sustained reward gains.</strong> Left: critic gradient norm before clipping. Right: explained variance, which measures how well value predictions account for return variation.</figcaption>
+    </figure>
+
+    <h3>Normalization creates room for smaller mini-batches</h3>
+    <p>We hold the critic learning rate fixed and compare one versus four mini-batches, with and without normalization. Normalization helps both configurations. Without it, the drop with one mini-batch is recoverable, but four smaller mini-batches collapse. This matches the trade-off: splitting more finely makes return noise harder to average out.</p>
+    <figure class="medium-figure">
+      <a class="figure-link" href="assets/figures/normalization.webp" data-lightbox aria-label="Enlarge the noise-normalization ablation">
+        <img src="assets/figures/normalization.webp" width="2400" height="1327" loading="lazy" alt="FrontierCS training and validation scores with one or four critic mini-batches, with or without normalization. Both normalized configurations retain gains; four mini-batches without normalization collapse.">
+      </a>
+      <figcaption><strong>Noise normalization improves stability with both mini-batch configurations.</strong> All four runs use actor-only filtering and critic learning rate 2 × 10⁻⁶. Left: training. Right: validation.</figcaption>
+    </figure>
+
+    <div class="seed-study">
+      <div>
+        <h3>Does this depend on critic initialization?</h3>
+        <p>We repeat EasyPPO and PPO + actor-only filtering three times on FrontierCS, changing the critic initialization. None of the three EasyPPO runs collapses; two of the three actor-only-filtering runs do.</p>
+        <p>EasyPPO also keeps a narrow range of validation scores across runs. Because of training cost, this study covers these two methods on FrontierCS.</p>
+      </div>
+      <figure>
+        <a class="figure-link" href="assets/figures/seeds.webp" data-lightbox aria-label="Enlarge the three-run critic initialization comparison">
+          <img src="assets/figures/seeds.webp" width="2400" height="1519" loading="lazy" alt="Mean validation performance and minimum-to-maximum ranges across three critic initializations. EasyPPO sustains higher scores with a narrower band than PPO with actor-only filtering.">
+        </a>
+        <figcaption><strong>Three critic initializations per method.</strong> Lines show the mean; bands show the minimum and maximum.</figcaption>
+      </figure>
+    </div>
+    <p class="closing">The standard PPO actor can learn reliably when the critic receives complete data, balanced return noise, and updates that contain the remaining outliers.</p>
+  </section>
+
+  <section class="section citation-section" id="citation" aria-labelledby="citation-title">
+    <div class="citation-heading"><h2 id="citation-title">BibTeX</h2><button class="copy-button" type="button" data-copy aria-describedby="copy-status" hidden>Copy citation</button></div>
+    <pre class="bibtex" tabindex="0" aria-label="BibTeX citation"><code id="bibtex">@misc{zhou2026easyppo,
+  title  = {EasyPPO: Stabilizing the Critic Is Key},
+  author = {Xuanyi Zhou and Qiuyang Mang and Dacheng Li and
+            Wenhao Chai and Mayank Mishra and Yichuan Wang and
+            Karthik Narasimhan and Alvin Cheung and Joseph Gonzalez},
+  year   = {2026},
+  url    = {https://easyppo.github.io/}
+}</code></pre>
+    <p id="copy-status" class="copy-status" role="status" aria-live="polite"></p>
+  </section>
+</main>
+
+<footer class="wrap">
+  <p><a class="footer-brand" href="#top">EasyPPO</a> <span>UC Berkeley · Princeton University</span></p>
+  <p class="footer-links"><a href="mailto:qmang@berkeley.edu">Contact</a><a href="https://github.com/EasyPPO/easyppo.github.io">Website source</a><a href="https://agent-tts.github.io/agent-tts/">Layout inspired by Agent-TTS</a></p>
+</footer>
+
+<dialog class="figure-dialog" aria-labelledby="dialog-title">
+  <div class="dialog-toolbar"><span id="dialog-title">Figure preview</span><a class="original-link" href="assets/figures/teaser.webp" target="_blank" rel="noopener">Open full size ↗</a><button class="close-dialog" type="button" aria-label="Close figure preview">×</button></div>
+  <div class="dialog-image-container"><img class="dialog-image" alt=""></div>
+  <p class="dialog-caption"></p>
+</dialog>
+</body>
+</html>
