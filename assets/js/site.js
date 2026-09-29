@@ -35,12 +35,21 @@ dialog.addEventListener("close", () => {
 const copyButton = document.querySelector("[data-copy]");
 const copyStatus = document.querySelector("#copy-status");
 copyButton.hidden = false;
+let copyReset;
 copyButton.addEventListener("click", async () => {
   const citation = document.querySelector("#bibtex");
   try {
     await navigator.clipboard.writeText(citation.textContent);
     copyStatus.textContent = "Citation copied.";
-    copyButton.textContent = "Copied";
+    copyButton.dataset.copied = "true";
+    copyButton.setAttribute("aria-label", "BibTeX copied");
+    copyButton.title = "Copied";
+    clearTimeout(copyReset);
+    copyReset = setTimeout(() => {
+      delete copyButton.dataset.copied;
+      copyButton.setAttribute("aria-label", "Copy BibTeX");
+      copyButton.title = "Copy BibTeX";
+    }, 2000);
   } catch {
     const selection = window.getSelection();
     const range = document.createRange();
