@@ -17,6 +17,8 @@ Open `http://localhost:8000`. No build step or JavaScript dependency installatio
 - Edit narrative, authors, links, and the score table in `index.html`.
 - Edit styling in `assets/css/style.css`.
 - The site uses self-hosted Palladio / Palatino-family fonts to match the manuscript. Font sources and license notices are in `assets/fonts/`.
+- The site logo is the [EasyPPO GitHub organization avatar](https://github.com/EasyPPO), saved in `assets/logos/easyppo.png`. The favicon, Apple touch icon, and social preview use the same artwork.
+- Equations use the manuscript’s `mathpazo` fonts, rendered as standalone SVGs. Edit the LaTeX in `assets/math/equations.json`, then run `python3 scripts/render_math.py` with LaTeX and dvisvgm installed. Desktop and mobile layouts are generated together; no browser-side math library is needed.
 - Figures are rendered from the corresponding manuscript PDFs, without changing plotted data. `assets/figure-manifest.json` records their source filenames, dimensions, checksums, and the manuscript commit.
 - To refresh those assets, run `python3 scripts/update_figures.py /path/to/manuscript` with Pillow and Poppler installed. Check the figures, HTML image dimensions, captions, score table, and social-preview image afterward.
 - Paper and Code are intentionally disabled gray buttons until their public URLs are available. Replace each with a link on release. The manuscript PDF is not published in this repository. The footer’s Website source link is only this website’s source.

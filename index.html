@@ -13,17 +13,19 @@
   <meta property="og:url" content="https://easyppo.github.io/">
   <meta property="og:image" content="https://easyppo.github.io/assets/social-preview.png">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/favicon.ico" sizes="any">
+  <link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="preload" href="assets/fonts/palladio-roman.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/palladio-bold.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/style.css?v=20260929-3">
   <script src="assets/js/site.js" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
 <nav class="nav" aria-label="Main navigation">
   <div class="nav-inner">
-    <a class="wordmark" href="#top">Easy<span>PPO</span></a>
+    <a class="wordmark" href="#top" aria-label="EasyPPO home"><img src="assets/logos/easyppo.png" width="34" height="34" alt=""><span>Easy<span class="wordmark-accent">PPO</span></span></a>
     <div class="nav-links">
       <a href="#overview">Overview</a>
       <a href="#filtering">Filtering</a>
@@ -37,8 +39,8 @@
 
 <header class="hero wrap" id="top">
   <p class="eyebrow">Reinforcement learning for language models</p>
-  <h1><span class="method-name">EasyPPO:</span><br>Stabilizing the Critic Is Key</h1>
-  <p class="hero-summary">PPO can learn well, then collapse. We trace two causes to the critic<br class="desktop-break"> and stabilize training with three simple changes.</p>
+  <h1><span class="title-brand"><img src="assets/logos/easyppo.png" width="64" height="64" alt=""><span class="method-name">EasyPPO:</span></span><span>Stabilizing the Critic Is Key</span></h1>
+  <p class="hero-summary"><span class="hero-topic">PPO in LLM Post-training</span>We trace two causes of training collapse to the critic<br class="desktop-break"> and stabilize learning with three simple changes.</p>
   <div class="institution-logos" aria-label="UC Berkeley and Princeton University">
     <img src="assets/logos/berkeley.svg" class="berkeley-logo" width="173" height="52" alt="UC Berkeley">
     <img src="assets/logos/princeton.svg" class="princeton-logo" width="189" height="49" alt="Princeton University">
@@ -107,19 +109,61 @@
     <p class="section-number">02 / Balance return noise across prompts</p>
     <h2 id="noise-title">A noisier prompt should not dominate the update</h2>
     <p>The same prompt can produce responses with very different rewards. Some prompts have consistent returns; others vary widely, especially in continuous-score coding tasks. We call this variation <em>return noise</em>.</p>
-    <p>The critic tries to predict the mean return, but trains on individual samples. Even when its prediction is accurate, a noisy sample can produce a large gradient. For a linear value head, the expected squared gradient contains both prediction error and return variance:</p>
-    <div class="equation-box" role="math" tabindex="0" aria-label="Expected squared critic gradient equals feature norm squared times the sum of squared prediction error and return variance.">
-      <span class="equation"><span class="equation-left">E[‖∇<sub>W</sub>ℒ<sub>V</sub>‖² | s] = ‖h(s)‖²</span> <span class="equation-bracket">[<span class="equation-term">(V(s) − E[R | s])²<span>prediction error</span></span> + <span class="equation-term noise-term">Var(R | s)<span>return noise</span></span>]</span></span>
+    <p>The critic tries to predict the mean return, but trains on individual samples. Even when its prediction is accurate, a noisy sample can produce a large gradient. For squared-error loss and a linear value head, the expected squared gradient contains both prediction error and return variance:</p>
+    <div class="math-display" data-equation="gradient-noise">
+      <picture style="--math-width: 597px; --math-compact-width: 384px">
+        <source media="(max-width: 700px)" srcset="assets/math/gradient-noise-compact.svg" width="384" height="140">
+        <img src="assets/math/gradient-noise.svg" width="597" height="93" alt="Expected squared critic gradient given s equals the squared feature norm times squared prediction error plus conditional return variance." loading="lazy">
+      </picture>
     </div>
-    <p class="equation-note">Here, <i>s</i> is a token prefix, <i>R</i> is its sampled return, and the value head predicts <i>V(s) = W<sup>⊤</sup>h(s)</i>. As predictions improve, the noise term can account for more of the gradient’s second moment.</p>
-    <p><strong>Noise-normalized critic regression</strong> divides the critic loss by the return standard deviation. With exact prefix-level variances, this makes the noise term constant while preserving the optimal mean prediction. In practice, we estimate one standard deviation per prompt from its rollout group, apply a floor, and normalize the weights to average one.</p>
+    <p class="equation-note">Here, <i>s</i> is a token prefix, <i>R</i> is its sampled return, and the value head predicts <i>V(s) = W<sup>⊤</sup>h(s)</i>. As predictions improve, the noise term can dominate this second moment. Prompts with more variable returns can therefore have disproportionate influence on finite-batch updates.</p>
+
+    <h3>Normalize the noise, keep the prediction target</h3>
+    <p><strong>Noise-normalized critic regression</strong> divides the critic loss by the return standard deviation. If we knew the true conditional standard deviation at every prefix, setting <i>w(s)</i> to its inverse would give:</p>
+    <div class="math-display" data-equation="normalized-gradient">
+      <picture style="--math-width: 739px; --math-compact-width: 396px">
+        <source media="(max-width: 700px)" srcset="assets/math/normalized-gradient-compact.svg" width="396" height="212">
+        <img src="assets/math/normalized-gradient.svg" width="739" height="145" alt="With the ideal weight, one over the conditional return standard deviation, the gradient second moment equals the squared feature norm times normalized squared prediction error plus one. The return-noise term is constant." loading="lazy">
+      </picture>
+    </div>
+    <p>The return-noise term is now <strong>one</strong>. Apart from the feature norm, the second moment reflects the normalized prediction error. Positive population weights preserve the optimal mean prediction while removing return-noise scale as a source of imbalance.</p>
+
+    <h3>From rollout groups to a weighted loss</h3>
+    <p>In practice, we estimate one standard deviation per prompt from its group of <i>n</i> sampled returns, including truncated responses. We reuse that estimate at every token in the response. Writing <i>R̄<sub>s</sub></i> for the group’s mean return and <i>ℬ</i> for the prompt batch, we compute:</p>
+    <div class="math-display" data-equation="group-weights">
+      <picture style="--math-width: 296px; --math-compact-width: 269px">
+        <source media="(max-width: 700px)" srcset="assets/math/group-weights-compact.svg" width="269" height="145">
+        <img src="assets/math/group-weights.svg" width="296" height="159" alt="For each prompt s, estimate the return standard deviation using the mean squared deviation of its n sampled returns, with divisor n. Set w(s) to one over max of estimated standard deviation and epsilon, then divide by the average of these inverse standard deviations over prompts in batch B." loading="lazy">
+      </picture>
+    </div>
+    <p>The floor <i>ε</i> prevents near-zero variance from producing an enormous weight. Dividing by the batch average keeps the prompt weights at mean one, so normalization does not arbitrarily rescale the whole loss.</p>
+    <div class="math-display" data-equation="weighted-loss">
+      <picture style="--math-width: 436px; --math-compact-width: 312px">
+        <source media="(max-width: 700px)" srcset="assets/math/weighted-loss-compact.svg" width="312" height="106">
+        <img src="assets/math/weighted-loss.svg" width="436" height="62" alt="Weighted critic loss equals one over twice the batch total valid-token count, times the sum over responses i of prompt weight w(s_i) times the sum over tokens t of squared prediction error, V(s_i,t) minus R_i." loading="lazy">
+      </picture>
+    </div>
+    <p class="equation-note">Response <i>i</i> has prompt <i>s<sub>i</sub></i>, return <i>R<sub>i</sub></i>, and <i>T<sub>i</sub></i> valid tokens; <i>s<sub>i,t</sub></i> is its prefix at token <i>t</i>. We keep the usual token-mean loss: weight each response’s squared errors, then divide by the batch’s total token count. Estimating weights from the same returns can introduce bias, but works well in our experiments.</p>
+
+    <h3>A floor tied to reward range and group size</h3>
+    <p>For discrete rewards with range <i>Δ</i>, consider a group with one maximum return and <i>n − 1</i> minimum returns. We choose the floor to be approximately half this reference group’s standard deviation:</p>
+    <div class="math-display" data-equation="std-floor">
+      <picture style="--math-width: 431px; --math-compact-width: 193px">
+        <source media="(max-width: 700px)" srcset="assets/math/std-floor-compact.svg" width="193" height="133">
+        <img src="assets/math/std-floor.svg" width="431" height="66" alt="A reference group with one maximum return and n minus one minimum returns has standard deviation Delta times the square root of (1/n)(1 minus 1/n). Choose epsilon = Delta divided by twice square root n, approximately half the reference standard deviation." loading="lazy">
+      </picture>
+    </div>
+    <p>With inverse-STD weighting, a group whose returns are all identical then gets about <strong>twice the weight</strong> of the reference group. For <i>n = 16</i>, this gives <i>ε = 0.125</i> for Search-R1’s [0, 1] rewards and <i>ε = 0.25</i> for AIME’s [−1, 1] rewards. FrontierCS has continuous rewards; we retain <i>ε = 0.075</i> from our initial experiments because of the cost of rerunning the suite.</p>
+
+    <h3>The same pattern appears in actual gradients</h3>
+    <p>As the critic learns, return noise accounts for more of the gradient scale. In the offline comparison below, the dependence on return variability becomes stronger at later checkpoints. Applying the weights largely flattens it, although some individual outliers remain.</p>
     <figure>
       <a class="figure-link" href="assets/figures/return-noise.webp" data-lightbox aria-label="Enlarge the return noise and critic gradient comparison">
         <img src="assets/figures/return-noise.webp" width="2400" height="1070" loading="lazy" alt="Box plots at training steps 30, 60, and 90 and pooled across those steps. Before normalization, prompts with higher return standard deviations tend to have larger gradient contributions. After normalization this relationship is much weaker.">
       </a>
       <figcaption><strong>The imbalance appears in the gradients, and normalization reduces it.</strong> Offline FrontierCS diagnostics at PPO training steps 30, 60, and 90. Top: unweighted gradients. Bottom: the same gradients after weighting. Each response contributes its summed token gradients divided by the batch’s total token count.</figcaption>
     </figure>
-    <div class="takeaway"><strong>What changes:</strong> prompts with noisier returns no longer receive extra influence simply because their return-noise scale is larger. Large individual gradients can still remain.</div>
+    <div class="takeaway"><strong>What changes:</strong> normalization makes gradient contributions more balanced across prompts. We handle the remaining outliers through the size of each critic mini-batch.</div>
   </section>
 
   <section class="section" id="mini-batches" aria-labelledby="mini-batches-title">
@@ -216,7 +260,7 @@
 </main>
 
 <footer class="wrap">
-  <p><a class="footer-brand" href="#top">EasyPPO</a> <span>UC Berkeley · Princeton University</span></p>
+  <p><a class="footer-brand" href="#top"><img src="assets/logos/easyppo.png" width="30" height="30" alt="">EasyPPO</a> <span>UC Berkeley · Princeton University</span></p>
   <p class="footer-links"><a href="mailto:qmang@berkeley.edu">Contact</a><a href="https://github.com/EasyPPO/easyppo.github.io">Website source</a><a href="https://agent-tts.github.io/agent-tts/">Layout inspired by Agent-TTS</a></p>
 </footer>
 

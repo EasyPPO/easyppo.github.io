@@ -1,0 +1,27 @@
+{
+  "gradient-noise": {
+    "tex": "\\mathbb{E}\\!\\left[\\|\\nabla_W\\mathcal{L}_V\\|_2^2\\mid s\\right]=\\|h(s)\\|_2^2\\left[\\underbrace{\\bigl(V(s)-\\mathbb{E}[R\\mid s]\\bigr)^2}_{\\text{Prediction error}}+\\underbrace{\\textcolor{accent}{\\operatorname{Var}(R\\mid s)}}_{\\textcolor{accent}{\\text{Return noise}}}\\right]",
+    "compact": "\\begin{gathered}\\mathbb{E}\\!\\left[\\|\\nabla_W\\mathcal{L}_V\\|_2^2\\mid s\\right]\\\\[6pt]=\\|h(s)\\|_2^2\\left[\\underbrace{\\bigl(V(s)-\\mathbb{E}[R\\mid s]\\bigr)^2}_{\\text{Prediction error}}+\\underbrace{\\textcolor{accent}{\\operatorname{Var}(R\\mid s)}}_{\\textcolor{accent}{\\text{Return noise}}}\\right]\\end{gathered}",
+    "alt": "Expected squared critic gradient given s equals the squared feature norm times squared prediction error plus conditional return variance."
+  },
+  "normalized-gradient": {
+    "tex": "\\mathbb{E}\\!\\left[\\|w(s)\\nabla_W\\mathcal{L}_V\\|_2^2\\mid s\\right]=\\|h(s)\\|_2^2\\left[\\underbrace{\\left(\\frac{V(s)-\\mathbb{E}[R\\mid s]}{\\sqrt{\\operatorname{Var}(R\\mid s)}}\\right)^2}_{\\text{Normalized prediction error}}+\\underbrace{\\vphantom{\\left(\\frac{V(s)-\\mathbb{E}[R\\mid s]}{\\sqrt{\\operatorname{Var}(R\\mid s)}}\\right)^2}\\textcolor{accent}{1}}_{\\textcolor{accent}{\\text{Constant return noise}}}\\right]",
+    "compact": "\\begin{gathered}\\mathbb{E}\\!\\left[\\|w(s)\\nabla_W\\mathcal{L}_V\\|_2^2\\mid s\\right]\\\\[6pt]=\\|h(s)\\|_2^2\\left[\\underbrace{\\left(\\frac{V(s)-\\mathbb{E}[R\\mid s]}{\\sqrt{\\operatorname{Var}(R\\mid s)}}\\right)^2}_{\\substack{\\text{Normalized}\\\\\\text{prediction error}}}+\\underbrace{\\vphantom{\\left(\\frac{V(s)-\\mathbb{E}[R\\mid s]}{\\sqrt{\\operatorname{Var}(R\\mid s)}}\\right)^2}\\textcolor{accent}{1}}_{\\textcolor{accent}{\\substack{\\text{Constant}\\\\\\text{return noise}}}}\\right]\\end{gathered}",
+    "alt": "With the ideal weight, one over the conditional return standard deviation, the gradient second moment equals the squared feature norm times normalized squared prediction error plus one. The return-noise term is constant."
+  },
+  "group-weights": {
+    "tex": "\\begin{gathered}\\hat\\sigma(s)=\\sqrt{\\frac{1}{n}\\sum_{j=1}^{n}\\bigl(R_{s,j}-\\bar R_s\\bigr)^2}\\\\[8pt]w(s)=\\frac{|\\mathcal B|/\\max\\{\\hat\\sigma(s),\\varepsilon\\}}{\\sum_{s^\\prime\\in\\mathcal B}1/\\max\\{\\hat\\sigma(s^\\prime),\\varepsilon\\}}\\end{gathered}",
+    "compact": "\\begin{gathered}\\hat\\sigma(s)=\\sqrt{\\frac{1}{n}\\sum_{j=1}^{n}\\bigl(R_{s,j}-\\bar R_s\\bigr)^2}\\\\[8pt]w(s)=\\frac{|\\mathcal B|/\\max\\{\\hat\\sigma(s),\\varepsilon\\}}{\\sum_{s^\\prime\\in\\mathcal B}1/\\max\\{\\hat\\sigma(s^\\prime),\\varepsilon\\}}\\end{gathered}",
+    "alt": "For each prompt s, estimate the return standard deviation using the mean squared deviation of its n sampled returns, with divisor n. Set w(s) to one over max of estimated standard deviation and epsilon, then divide by the average of these inverse standard deviations over prompts in batch B."
+  },
+  "weighted-loss": {
+    "tex": "\\mathcal{L}_V^{\\mathrm{weighted}}=\\frac{1}{2\\sum_i T_i}\\sum_i w(s_i)\\sum_{t=1}^{T_i}\\bigl(V(s_{i,t})-R_i\\bigr)^2",
+    "compact": "\\begin{gathered}\\mathcal{L}_V^{\\mathrm{weighted}}\\\\[5pt]=\\frac{1}{2\\sum_i T_i}\\sum_i w(s_i)\\sum_{t=1}^{T_i}\\bigl(V(s_{i,t})-R_i\\bigr)^2\\end{gathered}",
+    "alt": "Weighted critic loss equals one over twice the batch total valid-token count, times the sum over responses i of prompt weight w(s_i) times the sum over tokens t of squared prediction error, V(s_i,t) minus R_i."
+  },
+  "std-floor": {
+    "tex": "\\hat\\sigma_{\\mathrm{ref}}=\\Delta\\sqrt{\\frac{1}{n}\\left(1-\\frac{1}{n}\\right)},\\qquad\\textcolor{accent}{\\varepsilon=\\frac{\\Delta}{2\\sqrt n}}\\;\\approx\\;\\frac{\\hat\\sigma_{\\mathrm{ref}}}{2}",
+    "compact": "\\begin{gathered}\\hat\\sigma_{\\mathrm{ref}}=\\Delta\\sqrt{\\frac{1}{n}\\left(1-\\frac{1}{n}\\right)}\\\\[9pt]\\textcolor{accent}{\\varepsilon=\\frac{\\Delta}{2\\sqrt n}}\\;\\approx\\;\\frac{\\hat\\sigma_{\\mathrm{ref}}}{2}\\end{gathered}",
+    "alt": "A reference group with one maximum return and n minus one minimum returns has standard deviation Delta times the square root of (1/n)(1 minus 1/n). Choose epsilon = Delta divided by twice square root n, approximately half the reference standard deviation."
+  }
+}
