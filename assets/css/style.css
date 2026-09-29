@@ -39,7 +39,6 @@ h1 { display: flex; flex-direction: column; align-items: center; gap: 2px; font-
 .title-brand { display: inline-flex; align-items: center; justify-content: center; gap: 11px; }
 .title-brand img { display: block; flex: none; }
 .hero-summary { max-width: 770px; margin: 24px auto 29px; font-size: 21px; line-height: 1.6; color: #5c6066; }
-.hero-topic { display: block; color: var(--ink); margin-bottom: 5px; }
 .institution-logos { display: flex; align-items: center; justify-content: center; gap: 40px; margin: 0 auto 24px; }
 .institution-logos img { display: block; object-fit: contain; }
 .authors { max-width: 900px; margin: 0 auto; font-size: 19px; line-height: 1.9; }
