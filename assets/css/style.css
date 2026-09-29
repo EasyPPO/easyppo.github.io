@@ -143,6 +143,9 @@ body.dialog-open { overflow: hidden; }
   .authors { font-size: 15px; line-height: 1.95; }
   .affiliations { font-size: 14px; gap: 20px; margin-top: 13px; }
   .author-note { font-size: 12px; gap: 1px 15px; margin-top: 9px; }
+  .button-row { gap: 9px; }
+  .button { padding-inline: 13px; font-size: 14px; gap: 6px; }
+  .pending-label { font-size: 9px; }
   h2 { font-size: 24px; letter-spacing: -.4px; }
   h3 { font-size: 21px; }
   .section { padding-block: 34px; }
