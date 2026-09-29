@@ -81,12 +81,6 @@
   <section class="overview" id="overview" aria-labelledby="overview-title">
     <h2 id="overview-title">The idea in a minute</h2>
     <p>PPO<sup class="reference-link"><a href="#ref-ppo" aria-label="Reference 1: Schulman et al., 2017">[1]</a></sup> uses a critic to estimate how much reward a response is likely to earn. The actor uses that estimate to decide which responses to reinforce. If critic learning becomes unstable, the actor can lose a useful training signal.</p>
-    <figure class="teaser">
-      <a class="figure-link" href="assets/figures/teaser.webp" data-lightbox aria-label="Enlarge the EasyPPO method overview">
-        <img src="assets/figures/teaser.webp" width="2400" height="1269" loading="lazy" alt="Two rows compare critic failure modes with EasyPPO. Left: retain truncated responses for the critic only. Middle: balance gradient scales across prompts. Right: clip gradients from smaller critic mini-batches.">
-      </a>
-      <figcaption><strong>Three changes to stabilize PPO through critic learning.</strong></figcaption>
-    </figure>
     <div class="summary-box">
       <p><strong>Keep the critic’s training data complete.</strong> Filter unfinished responses from actor updates, but keep them when training the critic.</p>
       <p><strong>Balance the noise across prompts.</strong> Weight each prompt’s critic loss by the inverse standard deviation of its sampled returns.</p>
@@ -239,6 +233,12 @@
       </figure>
     </div>
     <p class="closing"><strong>The standard PPO actor can learn reliably</strong> when the critic receives complete data, balanced return noise, and updates that contain the remaining outliers.</p>
+    <figure class="teaser">
+      <a class="figure-link" href="assets/figures/teaser.webp" data-lightbox aria-label="Enlarge the EasyPPO method overview">
+        <img src="assets/figures/teaser.webp" width="2400" height="1269" loading="lazy" alt="Two rows compare critic failure modes with EasyPPO. Left: retain truncated responses for the critic only. Middle: balance gradient scales across prompts. Right: clip gradients from smaller critic mini-batches.">
+      </a>
+      <figcaption><strong>Three changes to stabilize PPO through critic learning.</strong></figcaption>
+    </figure>
   </section>
 
   <section class="section references-section" id="references" aria-labelledby="references-title">
