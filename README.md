@@ -22,7 +22,7 @@ Open `http://localhost:8000`. No build step or JavaScript dependency installatio
 - Figures are rendered from the corresponding manuscript PDFs, without changing plotted data. `assets/figure-manifest.json` records their source filenames, dimensions, checksums, and the manuscript commit.
 - The overview video is `assets/videos/easyppo_video.mp4`, with a poster in the same directory. It uses native playback controls and scales to the page width.
 - To refresh those assets, run `python3 scripts/update_figures.py /path/to/manuscript` with Pillow and Poppler installed. Check the figures, HTML image dimensions, captions, score table, and social-preview image afterward.
-- Paper and Code are intentionally disabled gray buttons until their public URLs are available. Replace each with a link on release. The manuscript PDF is not published in this repository. The footer’s Website source link is only this website’s source.
+- Code links to the [EasyPPO training repository](https://github.com/EasyPPO/EasyPPO). Paper remains a disabled gray button until its public URL is available. The manuscript PDF is not published in this repository. The footer’s Website source link is only this website’s source.
 - Keep score gains and seed-study claims synchronized with the paper. Reported percentage gains compare best validation checkpoints; seed-study bands are min–max, not confidence intervals.
 
 GitHub Pages serves the root of the `main` branch. `.nojekyll` keeps the site static.
