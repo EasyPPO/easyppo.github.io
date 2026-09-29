@@ -27,7 +27,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .nav { position: sticky; top: 0; z-index: 20; border-bottom: 1px solid var(--line); background: rgb(255 255 255 / 96%); backdrop-filter: blur(12px); }
 .nav-inner { max-width: var(--max-width); min-height: 61px; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 32px; }
 .wordmark { display: inline-flex; align-items: center; gap: 7px; color: var(--ink); font-size: 19px; font-weight: 700; letter-spacing: -.6px; flex: none; }
-.wordmark .wordmark-accent { color: var(--accent); }
+.wordmark .wordmark-accent, .method-name .wordmark-accent { color: var(--accent); }
 .wordmark img { display: block; flex: none; }
 .nav-links { display: flex; align-items: center; gap: 25px; font-size: 16px; white-space: nowrap; }
 .nav-links a { color: #5e6268; padding: 17px 0; }
@@ -35,7 +35,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .hero { text-align: center; padding-top: 55px; padding-bottom: 48px; }
 .eyebrow { color: var(--muted); font-size: 13px; letter-spacing: .09em; text-transform: uppercase; margin: 0 0 16px; }
 h1 { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: clamp(34px, 4.4vw, 50px); font-weight: 700; line-height: 1.17; letter-spacing: -.6px; margin: 0; }
-.method-name { color: var(--accent); }
+.method-name { color: var(--ink); }
 .title-brand { display: inline-flex; align-items: center; justify-content: center; gap: 11px; }
 .title-brand img { display: block; flex: none; }
 .hero-summary { max-width: 770px; margin: 24px auto 29px; font-size: 21px; line-height: 1.6; color: #5c6066; }
