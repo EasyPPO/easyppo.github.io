@@ -23,5 +23,10 @@
     "tex": "\\hat\\sigma_{\\mathrm{ref}}=\\Delta\\sqrt{\\frac{1}{n}\\left(1-\\frac{1}{n}\\right)},\\qquad\\textcolor{accent}{\\varepsilon=\\frac{\\Delta}{2\\sqrt n}}\\;\\approx\\;\\frac{\\hat\\sigma_{\\mathrm{ref}}}{2}",
     "compact": "\\begin{gathered}\\hat\\sigma_{\\mathrm{ref}}=\\Delta\\sqrt{\\frac{1}{n}\\left(1-\\frac{1}{n}\\right)}\\\\[9pt]\\textcolor{accent}{\\varepsilon=\\frac{\\Delta}{2\\sqrt n}}\\;\\approx\\;\\frac{\\hat\\sigma_{\\mathrm{ref}}}{2}\\end{gathered}",
     "alt": "A reference group with one maximum return and n minus one minimum returns has standard deviation Delta times the square root of (1/n)(1 minus 1/n). Choose epsilon = Delta divided by twice square root n, approximately half the reference standard deviation."
+  },
+  "learning-rate": {
+    "inline": true,
+    "tex": "1/\\sqrt{K}",
+    "alt": "1 divided by the square root of K"
   }
 }

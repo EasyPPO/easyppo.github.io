@@ -24,11 +24,12 @@ PREAMBLE = r'''\documentclass[border=2pt]{standalone}
 '''
 
 
-def render(name, tex, font_size):
+def render(name, tex, font_size, inline=False):
     with tempfile.TemporaryDirectory(prefix='easyppo-math-') as temporary:
         directory = Path(temporary)
         source = directory / 'equation.tex'
-        source.write_text(PREAMBLE + tex + '\n$\n\\end{document}\n')
+        preamble = PREAMBLE.replace('border=2pt', 'border=0.5pt').replace(r'\displaystyle', r'\textstyle') if inline else PREAMBLE
+        source.write_text(preamble + tex + '\n$\n\\end{document}\n')
         for command in (
             ['latex', '-interaction=batchmode', '-halt-on-error', source.name],
             ['dvisvgm', '--no-fonts', '--exact', '--output=equation.svg', 'equation.dvi'],
@@ -54,6 +55,15 @@ def main():
     equations = json.loads((MATH / 'equations.json').read_text())
     page = (ROOT / 'index.html').read_text()
     for name, equation in equations.items():
+        if equation.get('inline'):
+            width, height = render(name, equation['tex'], 16, inline=True)
+            image = f'<img src="assets/math/{name}.svg" width="{width}" height="{height}" style="width: {width / 16}em; height: {height / 16}em" alt="{html.escape(equation["alt"], quote=True)}">'
+            marker = rf'(<span class="math-inline" data-equation="{name}">)[\s\S]*?(</span>)'
+            page, count = re.subn(marker, lambda match: match[1] + image + match[2], page)
+            if count != 1:
+                raise ValueError(f'Expected one placeholder for {name}, found {count}')
+            print(f'{name}: inline {width}×{height}')
+            continue
         width, height = render(name, equation['tex'], 22)
         compact_width, compact_height = render(name + '-compact', equation.get('compact', equation['tex']), 20)
         picture = f'''<picture style="--math-width: {width}px; --math-compact-width: {compact_width}px">

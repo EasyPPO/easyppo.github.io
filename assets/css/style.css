@@ -76,6 +76,8 @@ figcaption strong { color: var(--ink); }
 .teaser .figure-link { padding: 3px 0 5px; }
 .takeaway { margin: 23px 0 0; padding: 5px 0 5px 21px; border-left: 2px solid var(--method); font-size: 18px; }
 .takeaway strong { color: var(--accent); }
+.math-inline { display: inline-block; white-space: nowrap; }
+.math-inline img { display: inline-block; vertical-align: -.18em; }
 .math-display { margin: 26px 0; padding: 8px 0; text-align: center; }
 .math-display picture { display: block; }
 .math-display img { display: block; width: var(--math-width); max-width: 100%; height: auto; margin-inline: auto; }
