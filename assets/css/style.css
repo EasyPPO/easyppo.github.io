@@ -85,7 +85,7 @@ figcaption strong { color: var(--ink); }
 table { width: 100%; min-width: 340px; table-layout: fixed; border-collapse: collapse; border-bottom: 1px solid #b9bdc3; font-size: 18px; line-height: 1.4; font-variant-numeric: tabular-nums; }
 caption { text-align: left; color: var(--ink); font-size: 21px; font-weight: 700; margin-bottom: 12px; }
 td, th { text-align: right; padding: 8px 12px; }
-th:first-child { text-align: left; width: 42%; }
+th:first-child { text-align: left; width: 32%; }
 thead th { border-bottom: 1px solid #b9bdc3; font-size: 17px; color: var(--ink); padding-top: 0; padding-bottom: 8px; }
 tbody th { font-weight: 400; }
 .ours { color: var(--accent); }
