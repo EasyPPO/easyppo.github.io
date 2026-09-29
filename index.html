@@ -14,9 +14,8 @@
   <meta property="og:image" content="https://easyppo.github.io/assets/social-preview.png">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="assets/fonts/palladio-roman.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/palladio-bold.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/css/style.css">
   <script src="assets/js/site.js" defer></script>
 </head>
@@ -85,7 +84,7 @@
       <p><strong>Keep the critic’s training data complete.</strong> Filter unfinished responses from actor updates, but keep them when training the critic.</p>
       <p><strong>Balance the noise across prompts.</strong> Weight each prompt’s critic loss by the inverse standard deviation of its sampled returns.</p>
       <p><strong>Limit how far outliers reach.</strong> Use moderately smaller critic mini-batches, with gradient clipping at each update.</p>
-      <p class="summary-last">The actor still uses the standard PPO update.</p>
+      <p class="summary-last">You can keep the standard PPO actor update or use your preferred actor-side improvements.</p>
     </div>
 
   </section>

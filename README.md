@@ -16,6 +16,7 @@ Open `http://localhost:8000`. No build step or JavaScript dependency installatio
 
 - Edit narrative, authors, links, and the score table in `index.html`.
 - Edit styling in `assets/css/style.css`.
+- The site uses self-hosted Palladio / Palatino-family fonts to match the manuscript. Font sources and license notices are in `assets/fonts/`.
 - Figures are rendered from the corresponding manuscript PDFs, without changing plotted data. `assets/figure-manifest.json` records their source filenames, dimensions, checksums, and the manuscript commit.
 - To refresh those assets, run `python3 scripts/update_figures.py /path/to/manuscript` with Pillow and Poppler installed. Check the figures, HTML image dimensions, captions, score table, and social-preview image afterward.
 - Paper and Code are intentionally disabled gray buttons until their public URLs are available. Replace each with a link on release. The manuscript PDF is not published in this repository. The footer’s Website source link is only this website’s source.
