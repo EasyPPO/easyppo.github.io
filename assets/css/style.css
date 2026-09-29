@@ -63,6 +63,8 @@ main > section { scroll-margin-top: 82px; }
 .summary-box { background: #fff; padding: 2px 0 2px 23px; margin: 24px 0 31px; border-left: 2px solid var(--method); }
 .summary-box p { margin-bottom: 12px; }
 .summary-box .summary-last { margin: 19px 0 0; }
+.overview-video { width: min(100%, 880px); margin: 28px auto 12px; }
+.overview-video video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; background: #fff; border: 1px solid var(--line); border-radius: 5px; }
 .section { border-top: 1px solid var(--line); padding: 43px 0 39px; }
 
 figure { margin: 29px 0 24px; }
